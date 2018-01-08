@@ -52,7 +52,7 @@ class vgg16:
             biases = tf.Variable(tf.constant(0.0, shape=[64], dtype=tf_dtype),
                                  trainable=True, name='biases')
             out = tf.nn.bias_add(conv, biases)
-            conv1_1 = tf.nn.relu(batch_normal(out,scope="c_bn1"), name=scope)
+            conv1_1 = tf.nn.relu(tf.layers.batch_normalization(out))
             self.conv1_1 = tf.nn.dropout(conv1_1,keep_prob=self.keep_prob)
 
             # tf.summary.histogram("conv1_1",self.conv1_1)
@@ -65,7 +65,7 @@ class vgg16:
             biases = tf.Variable(tf.constant(0.0, shape=[64], dtype=tf_dtype),
                                  trainable=True, name='biases')
             out = tf.nn.bias_add(conv, biases)
-            conv1_2 = tf.nn.relu(batch_normal(out,scope="c_bn2"), name=scope)
+            conv1_2 = tf.nn.relu(tf.layers.batch_normalization(out))
             self.conv1_2 = tf.nn.dropout(conv1_2,keep_prob=self.keep_prob)
             # tf.summary.histogram("conv1_2", self.conv1_2)
         # pool1
@@ -84,7 +84,7 @@ class vgg16:
             biases = tf.Variable(tf.constant(0.0, shape=[128], dtype=tf_dtype),
                                  trainable=True, name='biases')
             out = tf.nn.bias_add(conv, biases)
-            conv2_1 = tf.nn.relu(batch_normal(out,scope="c_bn3"), name=scope)
+            conv2_1 = tf.nn.relu(tf.layers.batch_normalization(out))
             self.conv2_1 = tf.nn.dropout(conv2_1,keep_prob=self.keep_prob)
             # tf.summary.histogram("conv2_1", self.conv2_1)
         # conv2_2
@@ -96,7 +96,7 @@ class vgg16:
             biases = tf.Variable(tf.constant(0.0, shape=[128], dtype=tf_dtype),
                                  trainable=True, name='biases')
             out = tf.nn.bias_add(conv, biases)
-            conv2_2 = tf.nn.relu(batch_normal(out,scope="c_bn4"), name=scope)
+            conv2_2 = tf.nn.relu(tf.layers.batch_normalization(out))
             self.conv2_2 = tf.nn.dropout(conv2_2,keep_prob=self.keep_prob)
             # tf.summary.histogram("conv2_2", self.conv2_2)
         # pool2
@@ -115,7 +115,7 @@ class vgg16:
             biases = tf.Variable(tf.constant(0.0, shape=[256], dtype=tf_dtype),
                                  trainable=True, name='biases')
             out = tf.nn.bias_add(conv, biases)
-            conv3_1 = tf.nn.relu(batch_normal(out,scope="c_bn5"), name=scope)
+            conv3_1 = tf.nn.relu(tf.layers.batch_normalization(out))
             self.conv3_1 = tf.nn.dropout(conv3_1,keep_prob=self.keep_prob)
 
             # tf.summary.histogram("conv3_1", self.conv3_1)
@@ -128,7 +128,7 @@ class vgg16:
             biases = tf.Variable(tf.constant(0.0, shape=[256], dtype=tf_dtype),
                                  trainable=True, name='biases')
             out = tf.nn.bias_add(conv, biases)
-            conv3_2 = tf.nn.relu(batch_normal(out,scope="c_bn6"), name=scope)
+            conv3_2 = tf.nn.relu(tf.layers.batch_normalization(out))
             self.conv3_2 = tf.nn.dropout(conv3_2,keep_prob=self.keep_prob)
             # tf.summary.histogram("conv3_2", self.conv3_2)
         # conv3_3
@@ -140,7 +140,7 @@ class vgg16:
             biases = tf.Variable(tf.constant(0.0, shape=[256], dtype=tf_dtype),
                                  trainable=True, name='biases')
             out = tf.nn.bias_add(conv, biases)
-            conv3_3 = tf.nn.relu(batch_normal(out,scope="c_bn7"), name=scope)
+            conv3_3 = tf.nn.relu(tf.layers.batch_normalization(out))
             self.conv3_3 = tf.nn.dropout(conv3_3,keep_prob=self.keep_prob)
             # tf.summary.histogram("conv3_3", self.conv3_3)
         # pool3
@@ -159,7 +159,7 @@ class vgg16:
             biases = tf.Variable(tf.constant(0.0, shape=[512], dtype=tf_dtype),
                                  trainable=True, name='biases')
             out = tf.nn.bias_add(conv, biases)
-            conv4_1 = tf.nn.relu(batch_normal(out,scope="c_bn8"), name=scope)
+            conv4_1 = tf.nn.relu(tf.layers.batch_normalization(out))
             self.conv4_1 = tf.nn.dropout(conv4_1,keep_prob=self.keep_prob)
             # tf.summary.histogram("conv4_1", self.conv4_1)
         # conv4_2
@@ -171,7 +171,7 @@ class vgg16:
             biases = tf.Variable(tf.constant(0.0, shape=[512], dtype=tf_dtype),
                                  trainable=True, name='biases')
             out = tf.nn.bias_add(conv, biases)
-            conv4_2 = tf.nn.relu(batch_normal(out,scope="c_bn9"), name=scope)
+            conv4_2 = tf.nn.relu(tf.layers.batch_normalization(out))
             self.conv4_2 = tf.nn.dropout(conv4_2,keep_prob=self.keep_prob)
             # tf.summary.histogram("conv4_2", self.conv4_2)
         # conv4_3
@@ -183,7 +183,7 @@ class vgg16:
             biases = tf.Variable(tf.constant(0.0, shape=[512], dtype=tf_dtype),
                                  trainable=True, name='biases')
             out = tf.nn.bias_add(conv, biases)
-            conv4_3 = tf.nn.relu(batch_normal(out,scope="c_bn10"), name=scope)
+            conv4_3 = tf.nn.relu(tf.layers.batch_normalization(out))
             self.conv4_3 = tf.nn.dropout(conv4_3,keep_prob=self.keep_prob)
             # tf.summary.histogram("conv4_3", self.conv4_3)
         # pool4
@@ -203,7 +203,7 @@ class vgg16:
             biases = tf.Variable(tf.constant(0.0, shape=[512], dtype=tf_dtype),
                                  trainable=True, name='biases')
             out = tf.nn.bias_add(conv, biases)
-            conv5_1 = tf.nn.relu(batch_normal(out,scope="c_bn11"), name=scope)
+            conv5_1 = tf.nn.relu(tf.layers.batch_normalization(out))
             self.conv5_1 = tf.nn.dropout(conv5_1,keep_prob=self.keep_prob)
             # tf.summary.histogram("conv5_1", self.conv5_1)
         # conv5_2
@@ -215,7 +215,7 @@ class vgg16:
             biases = tf.Variable(tf.constant(0.0, shape=[512], dtype=tf_dtype),
                                  trainable=True, name='biases')
             out = tf.nn.bias_add(conv, biases)
-            conv5_2 = tf.nn.relu(batch_normal(out,scope="c_bn12"), name=scope)
+            conv5_2 = tf.nn.relu(tf.layers.batch_normalization(out))
             self.conv5_2 = tf.nn.dropout(conv5_2,keep_prob=self.keep_prob)
             # tf.summary.histogram("conv5_2", self.conv5_2)
         # conv5_3
@@ -228,7 +228,7 @@ class vgg16:
             biases = tf.Variable(tf.constant(0.0, shape=[512], dtype=tf_dtype),
                                  trainable=True, name='biases')
             out = tf.nn.bias_add(conv, biases)
-            conv5_3 = tf.nn.relu(batch_normal(out,scope="c_bn13"), name=scope)
+            conv5_3 = tf.nn.relu(tf.layers.batch_normalization(out))
             self.conv5_3 = tf.nn.dropout(conv5_3,keep_prob=self.keep_prob)
             # tf.summary.histogram("conv5_3", self.conv5_3)
         # pool5
@@ -251,7 +251,7 @@ class vgg16:
             pool5_flat = tf.reshape(self.pool5, [-1, shape])
             fc1l = tf.nn.bias_add(tf.matmul(pool5_flat, fc1w), fc1b)
             #self.fc1 = tf.nn.relu(fc1l)
-            fc1 = tf.nn.relu(batch_normal(fc1l,scope="fc_bn1"))
+            fc1 = tf.nn.relu(tf.layers.batch_normalization(fc1l))
             self.fc1 = tf.nn.dropout(fc1,keep_prob=self.keep_prob)
             # tf.summary.histogram("fc1", self.fc1)
         # fc2
