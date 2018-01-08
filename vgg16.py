@@ -17,10 +17,15 @@ import os
 import sys
 import datetime
 import gc
+from tensorflow.contrib.layers.python.layers import batch_norm
 
 # 修改
 tf.set_random_seed(10)
-tf_dtype = tf.float16
+tf_dtype = tf.float32
+def batch_normal(input , scope="scope" , reuse=False):
+    return batch_norm(input , epsilon=1e-5, decay=0.9 , scale=True, scope=scope , reuse = reuse , updates_collections=None)
+
+
 
 class vgg16:
     def __init__(self, imgs, label, class_num, learning_rate,keep_prob,count):
@@ -29,34 +34,39 @@ class vgg16:
         self.count = count
         self.classes = class_num
         self.lr = learning_rate
-        self.convlayers()
         self.keep_prob = keep_prob
+        self.convlayers()
         self.fc_layers()
         self.probs = self.fc3l
         print('probs', self.probs.get_shape())
         self.optimize()
 
     def convlayers(self):
-
+        tf.glorot_normal_initializer()
         # conv1_1
         with tf.name_scope('conv1_1') as scope:
-            kernel = tf.Variable(tf.truncated_normal([3, 3, 1, 64], dtype=tf_dtype,
-                                                     stddev=1e-1), name='weights')
+            # kernel = tf.Variable(tf.truncated_normal([3, 3, 1, 64], dtype=tf_dtype,
+            #                                          stddev=1e-1), name='weights')
+            kernel = tf.get_variable('weights',shape=[3,3,1,64],initializer=tf.glorot_normal_initializer())
             conv = tf.nn.conv2d(self.imgs, kernel, [1, 1, 1, 1], padding='SAME')
             biases = tf.Variable(tf.constant(0.0, shape=[64], dtype=tf_dtype),
                                  trainable=True, name='biases')
             out = tf.nn.bias_add(conv, biases)
-            self.conv1_1 = tf.nn.relu(out, name=scope)
+            conv1_1 = tf.nn.relu(batch_normal(out,scope="c_bn1"), name=scope)
+            self.conv1_1 = tf.nn.dropout(conv1_1,keep_prob=self.keep_prob)
+
             # tf.summary.histogram("conv1_1",self.conv1_1)
         # conv1_2
         with tf.name_scope('conv1_2') as scope:
-            kernel = tf.Variable(tf.truncated_normal([3, 3, 64, 64], dtype=tf_dtype,
-                                                     stddev=1e-1), name='weights')
+            # kernel = tf.Variable(tf.truncated_normal([3, 3, 64, 64], dtype=tf_dtype,
+            #                                          stddev=1e-1), name='weights')
+            kernel = tf.get_variable('weights',shape=[3,3,64,64],initializer=tf.glorot_normal_initializer())
             conv = tf.nn.conv2d(self.conv1_1, kernel, [1, 1, 1, 1], padding='SAME')
             biases = tf.Variable(tf.constant(0.0, shape=[64], dtype=tf_dtype),
                                  trainable=True, name='biases')
             out = tf.nn.bias_add(conv, biases)
-            self.conv1_2 = tf.nn.relu(out, name=scope)
+            conv1_2 = tf.nn.relu(batch_normal(out,scope="c_bn2"), name=scope)
+            self.conv1_2 = tf.nn.dropout(conv1_2,keep_prob=self.keep_prob)
             # tf.summary.histogram("conv1_2", self.conv1_2)
         # pool1
         self.pool1 = tf.nn.max_pool(self.conv1_2,
@@ -67,23 +77,27 @@ class vgg16:
 
         # conv2_1
         with tf.name_scope('conv2_1') as scope:
-            kernel = tf.Variable(tf.truncated_normal([3, 3, 64, 128], dtype=tf_dtype,
-                                                     stddev=1e-1), name='weights')
+            # kernel = tf.Variable(tf.truncated_normal([3, 3, 64, 128], dtype=tf_dtype,
+            #                                          stddev=1e-1), name='weights')
+            kernel = tf.get_variable('weights',shape=[3,3,64,128],initializer=tf.glorot_normal_initializer())
             conv = tf.nn.conv2d(self.pool1, kernel, [1, 1, 1, 1], padding='SAME')
             biases = tf.Variable(tf.constant(0.0, shape=[128], dtype=tf_dtype),
                                  trainable=True, name='biases')
             out = tf.nn.bias_add(conv, biases)
-            self.conv2_1 = tf.nn.relu(out, name=scope)
+            conv2_1 = tf.nn.relu(batch_normal(out,scope="c_bn3"), name=scope)
+            self.conv2_1 = tf.nn.dropout(conv2_1,keep_prob=self.keep_prob)
             # tf.summary.histogram("conv2_1", self.conv2_1)
         # conv2_2
         with tf.name_scope('conv2_2') as scope:
-            kernel = tf.Variable(tf.truncated_normal([3, 3, 128, 128], dtype=tf_dtype,
-                                                     stddev=1e-1), name='weights')
+            # kernel = tf.Variable(tf.truncated_normal([3, 3, 128, 128], dtype=tf_dtype,
+            #                                          stddev=1e-1), name='weights')
+            kernel = tf.get_variable('weights',shape=[3,3,128,128],initializer=tf.glorot_normal_initializer())
             conv = tf.nn.conv2d(self.conv2_1, kernel, [1, 1, 1, 1], padding='SAME')
             biases = tf.Variable(tf.constant(0.0, shape=[128], dtype=tf_dtype),
                                  trainable=True, name='biases')
             out = tf.nn.bias_add(conv, biases)
-            self.conv2_2 = tf.nn.relu(out, name=scope)
+            conv2_2 = tf.nn.relu(batch_normal(out,scope="c_bn4"), name=scope)
+            self.conv2_2 = tf.nn.dropout(conv2_2,keep_prob=self.keep_prob)
             # tf.summary.histogram("conv2_2", self.conv2_2)
         # pool2
         self.pool2 = tf.nn.max_pool(self.conv2_2,
@@ -94,33 +108,40 @@ class vgg16:
 
         # conv3_1
         with tf.name_scope('conv3_1') as scope:
-            kernel = tf.Variable(tf.truncated_normal([3, 3, 128, 256], dtype=tf_dtype,
-                                                     stddev=1e-1), name='weights')
+            # kernel = tf.Variable(tf.truncated_normal([3, 3, 128, 256], dtype=tf_dtype,
+            #                                          stddev=1e-1), name='weights')
+            kernel = tf.get_variable('weights',shape=[3,3,128,256],initializer=tf.glorot_normal_initializer())
             conv = tf.nn.conv2d(self.pool2, kernel, [1, 1, 1, 1], padding='SAME')
             biases = tf.Variable(tf.constant(0.0, shape=[256], dtype=tf_dtype),
                                  trainable=True, name='biases')
             out = tf.nn.bias_add(conv, biases)
-            self.conv3_1 = tf.nn.relu(out, name=scope)
+            conv3_1 = tf.nn.relu(batch_normal(out,scope="c_bn5"), name=scope)
+            self.conv3_1 = tf.nn.dropout(conv3_1,keep_prob=self.keep_prob)
+
             # tf.summary.histogram("conv3_1", self.conv3_1)
         # conv3_2
         with tf.name_scope('conv3_2') as scope:
-            kernel = tf.Variable(tf.truncated_normal([3, 3, 256, 256], dtype=tf_dtype,
-                                                     stddev=1e-1), name='weights')
+            # kernel = tf.Variable(tf.truncated_normal([3, 3, 256, 256], dtype=tf_dtype,
+            #                                          stddev=1e-1), name='weights')
+            kernel = tf.get_variable('weights',shape=[3,3,256,256],initializer=tf.glorot_normal_initializer())
             conv = tf.nn.conv2d(self.conv3_1, kernel, [1, 1, 1, 1], padding='SAME')
             biases = tf.Variable(tf.constant(0.0, shape=[256], dtype=tf_dtype),
                                  trainable=True, name='biases')
             out = tf.nn.bias_add(conv, biases)
-            self.conv3_2 = tf.nn.relu(out, name=scope)
+            conv3_2 = tf.nn.relu(batch_normal(out,scope="c_bn6"), name=scope)
+            self.conv3_2 = tf.nn.dropout(conv3_2,keep_prob=self.keep_prob)
             # tf.summary.histogram("conv3_2", self.conv3_2)
         # conv3_3
         with tf.name_scope('conv3_3') as scope:
-            kernel = tf.Variable(tf.truncated_normal([3, 3, 256, 256], dtype=tf_dtype,
-                                                     stddev=1e-1), name='weights')
+            # kernel = tf.Variable(tf.truncated_normal([3, 3, 256, 256], dtype=tf_dtype,
+            #                                          stddev=1e-1), name='weights')
+            kernel = tf.get_variable('weights',shape=[3,3,256,256],initializer=tf.glorot_normal_initializer())
             conv = tf.nn.conv2d(self.conv3_2, kernel, [1, 1, 1, 1], padding='SAME')
             biases = tf.Variable(tf.constant(0.0, shape=[256], dtype=tf_dtype),
                                  trainable=True, name='biases')
             out = tf.nn.bias_add(conv, biases)
-            self.conv3_3 = tf.nn.relu(out, name=scope)
+            conv3_3 = tf.nn.relu(batch_normal(out,scope="c_bn7"), name=scope)
+            self.conv3_3 = tf.nn.dropout(conv3_3,keep_prob=self.keep_prob)
             # tf.summary.histogram("conv3_3", self.conv3_3)
         # pool3
         self.pool3 = tf.nn.max_pool(self.conv3_3,
@@ -131,33 +152,39 @@ class vgg16:
 
         # conv4_1
         with tf.name_scope('conv4_1') as scope:
-            kernel = tf.Variable(tf.truncated_normal([3, 3, 256, 512], dtype=tf_dtype,
-                                                     stddev=1e-1), name='weights')
+            # kernel = tf.Variable(tf.truncated_normal([3, 3, 256, 512], dtype=tf_dtype,
+            #                                          stddev=1e-1), name='weights')
+            kernel = tf.get_variable('weights',shape=[3,3,256,512],initializer=tf.glorot_normal_initializer())
             conv = tf.nn.conv2d(self.pool3, kernel, [1, 1, 1, 1], padding='SAME')
             biases = tf.Variable(tf.constant(0.0, shape=[512], dtype=tf_dtype),
                                  trainable=True, name='biases')
             out = tf.nn.bias_add(conv, biases)
-            self.conv4_1 = tf.nn.relu(out, name=scope)
+            conv4_1 = tf.nn.relu(batch_normal(out,scope="c_bn8"), name=scope)
+            self.conv4_1 = tf.nn.dropout(conv4_1,keep_prob=self.keep_prob)
             # tf.summary.histogram("conv4_1", self.conv4_1)
         # conv4_2
         with tf.name_scope('conv4_2') as scope:
-            kernel = tf.Variable(tf.truncated_normal([3, 3, 512, 512], dtype=tf_dtype,
-                                                     stddev=1e-1), name='weights')
+            # kernel = tf.Variable(tf.truncated_normal([3, 3, 512, 512], dtype=tf_dtype,
+            #                                          stddev=1e-1), name='weights')
+            kernel = tf.get_variable('weights',shape=[3,3,512,512],initializer=tf.glorot_normal_initializer())
             conv = tf.nn.conv2d(self.conv4_1, kernel, [1, 1, 1, 1], padding='SAME')
             biases = tf.Variable(tf.constant(0.0, shape=[512], dtype=tf_dtype),
                                  trainable=True, name='biases')
             out = tf.nn.bias_add(conv, biases)
-            self.conv4_2 = tf.nn.relu(out, name=scope)
+            conv4_2 = tf.nn.relu(batch_normal(out,scope="c_bn9"), name=scope)
+            self.conv4_2 = tf.nn.dropout(conv4_2,keep_prob=self.keep_prob)
             # tf.summary.histogram("conv4_2", self.conv4_2)
         # conv4_3
         with tf.name_scope('conv4_3') as scope:
-            kernel = tf.Variable(tf.truncated_normal([3, 3, 512, 512], dtype=tf_dtype,
-                                                     stddev=1e-1), name='weights')
+            # kernel = tf.Variable(tf.truncated_normal([3, 3, 512, 512], dtype=tf_dtype,
+            #                                          stddev=1e-1), name='weights')
+            kernel = tf.get_variable('weights',shape=[3,3,512,512],initializer=tf.glorot_normal_initializer())
             conv = tf.nn.conv2d(self.conv4_2, kernel, [1, 1, 1, 1], padding='SAME')
             biases = tf.Variable(tf.constant(0.0, shape=[512], dtype=tf_dtype),
                                  trainable=True, name='biases')
             out = tf.nn.bias_add(conv, biases)
-            self.conv4_3 = tf.nn.relu(out, name=scope)
+            conv4_3 = tf.nn.relu(batch_normal(out,scope="c_bn10"), name=scope)
+            self.conv4_3 = tf.nn.dropout(conv4_3,keep_prob=self.keep_prob)
             # tf.summary.histogram("conv4_3", self.conv4_3)
         # pool4
         self.pool4 = tf.nn.max_pool(self.conv4_3,
@@ -168,35 +195,42 @@ class vgg16:
 
         # conv5_1
         with tf.name_scope('conv5_1') as scope:
-            kernel = tf.Variable(tf.truncated_normal([3, 3, 512, 512], dtype=tf_dtype,
-                                                     stddev=1e-1), name='weights')
+            # kernel = tf.Variable(tf.truncated_normal([3, 3, 512, 512], dtype=tf_dtype,
+            #                                          stddev=1e-1), name='weights')
+            kernel = tf.get_variable('weights',shape=[3,3,512,512],initializer=tf.glorot_normal_initializer())
+
             conv = tf.nn.conv2d(self.pool4, kernel, [1, 1, 1, 1], padding='SAME')
             biases = tf.Variable(tf.constant(0.0, shape=[512], dtype=tf_dtype),
                                  trainable=True, name='biases')
             out = tf.nn.bias_add(conv, biases)
-            self.conv5_1 = tf.nn.relu(out, name=scope)
+            conv5_1 = tf.nn.relu(batch_normal(out,scope="c_bn11"), name=scope)
+            self.conv5_1 = tf.nn.dropout(conv5_1,keep_prob=self.keep_prob)
             # tf.summary.histogram("conv5_1", self.conv5_1)
         # conv5_2
         with tf.name_scope('conv5_2') as scope:
-            kernel = tf.Variable(tf.truncated_normal([3, 3, 512, 512], dtype=tf_dtype,
-                                                     stddev=1e-1), name='weights')
+            # kernel = tf.Variable(tf.truncated_normal([3, 3, 512, 512], dtype=tf_dtype,
+            #                                          stddev=1e-1), name='weights')
+            kernel = tf.get_variable('weights',shape=[3,3,512,512],initializer=tf.glorot_normal_initializer())
             conv = tf.nn.conv2d(self.conv5_1, kernel, [1, 1, 1, 1], padding='SAME')
             biases = tf.Variable(tf.constant(0.0, shape=[512], dtype=tf_dtype),
                                  trainable=True, name='biases')
             out = tf.nn.bias_add(conv, biases)
-            self.conv5_2 = tf.nn.relu(out, name=scope)
+            conv5_2 = tf.nn.relu(batch_normal(out,scope="c_bn12"), name=scope)
+            self.conv5_2 = tf.nn.dropout(conv5_2,keep_prob=self.keep_prob)
             # tf.summary.histogram("conv5_2", self.conv5_2)
         # conv5_3
         with tf.name_scope('conv5_3') as scope:
-            kernel = tf.Variable(tf.truncated_normal([3, 3, 512, 512], dtype=tf_dtype,
-                                                     stddev=1e-1), name='weights')
+            # kernel = tf.Variable(tf.truncated_normal([3, 3, 512, 512], dtype=tf_dtype,
+            #                                          stddev=1e-1), name='weights')
+            kernel = tf.get_variable('weights',shape=[3,3,512,512],initializer=tf.glorot_normal_initializer())
+
             conv = tf.nn.conv2d(self.conv5_2, kernel, [1, 1, 1, 1], padding='SAME')
             biases = tf.Variable(tf.constant(0.0, shape=[512], dtype=tf_dtype),
                                  trainable=True, name='biases')
             out = tf.nn.bias_add(conv, biases)
-            self.conv5_3 = tf.nn.relu(out, name=scope)
+            conv5_3 = tf.nn.relu(batch_normal(out,scope="c_bn13"), name=scope)
+            self.conv5_3 = tf.nn.dropout(conv5_3,keep_prob=self.keep_prob)
             # tf.summary.histogram("conv5_3", self.conv5_3)
-
         # pool5
         self.pool5 = tf.nn.max_pool(self.conv5_3,
                                ksize=[1, 2, 2, 1],
@@ -208,37 +242,40 @@ class vgg16:
         # fc1
         with tf.name_scope('fc1') as scope:
             shape = int(np.prod(self.pool5.get_shape()[1:]))
-            fc1w = tf.Variable(tf.truncated_normal([shape, 512],
-                                                         dtype=tf_dtype,
-                                                         stddev=1e-1), name='weights')
+            # fc1w = tf.Variable(tf.truncated_normal([shape, 512],
+            #                                              dtype=tf_dtype,
+            #                                              stddev=1e-1), name='weights')
+            fc1w = tf.get_variable('weights',shape=[shape,512],initializer=tf.glorot_normal_initializer())
             fc1b = tf.Variable(tf.constant(1.0, shape=[512], dtype=tf_dtype),
                                  trainable=True, name='biases')
             pool5_flat = tf.reshape(self.pool5, [-1, shape])
             fc1l = tf.nn.bias_add(tf.matmul(pool5_flat, fc1w), fc1b)
             #self.fc1 = tf.nn.relu(fc1l)
-            fc1 = tf.nn.relu(fc1l)
+            fc1 = tf.nn.relu(batch_normal(fc1l,scope="fc_bn1"))
             self.fc1 = tf.nn.dropout(fc1,keep_prob=self.keep_prob)
             # tf.summary.histogram("fc1", self.fc1)
         # fc2
-        with tf.name_scope('fc2') as scope:
-            fc2w = tf.Variable(tf.truncated_normal([512, 512],
-                                                         dtype=tf_dtype,
-                                                         stddev=1e-1), name='weights')
-            fc2b = tf.Variable(tf.constant(1.0, shape=[512], dtype=tf_dtype),
-                                 trainable=True, name='biases')
-            fc2l = tf.nn.bias_add(tf.matmul(self.fc1, fc2w), fc2b)
-            #self.fc2 = tf.nn.relu(fc2l)
-            fc2 = tf.nn.relu(fc2l)
-            self.fc2 = tf.nn.dropout(fc2, keep_prob=self.keep_prob)
+        # with tf.name_scope('fc2') as scope:
+        #     fc2w = tf.Variable(tf.truncated_normal([512, 512],
+        #                                                  dtype=tf_dtype,
+        #                                                  stddev=1e-1), name='weights')
+        #     fc2b = tf.Variable(tf.constant(1.0, shape=[512], dtype=tf_dtype),
+        #                          trainable=True, name='biases')
+        #     fc2l = tf.nn.bias_add(tf.matmul(self.fc1, fc2w), fc2b)
+        #     #self.fc2 = tf.nn.relu(fc2l)
+        #     fc2 = tf.nn.relu(batch_normal(fc2l,scope="fc_bn2"))
+        #     self.fc2 = tf.nn.dropout(fc2, keep_prob=self.keep_prob)
             # tf.summary.histogram("fc2", self.fc2)
         # fc3
         with tf.name_scope('fc3') as scope:
-            fc3w = tf.Variable(tf.truncated_normal([512, self.classes],
-                                                         dtype=tf_dtype,
-                                                         stddev=1e-1), name='weights')
+            # fc3w = tf.Variable(tf.truncated_normal([512, self.classes],
+            #                                              dtype=tf_dtype,
+            #                                              stddev=1e-1), name='weights')
+            fc3w = tf.get_variable('weights',shape=[512,self.classes],initializer=tf.glorot_normal_initializer())
+
             fc3b = tf.Variable(tf.constant(1.0, shape=[self.classes], dtype=tf_dtype),
                                  trainable=True, name='biases')
-            self.fc3l = tf.nn.bias_add(tf.matmul(self.fc2, fc3w), fc3b)
+            self.fc3l = tf.nn.bias_add(tf.matmul(self.fc1, fc3w), fc3b)
             # tf.summary.histogram("fc3", self.fc3l)
 
     def optimize(self):
@@ -376,7 +413,7 @@ def construct_train_imgs(img_dir, classes):
 
 def generate_batch(input_imgs, input_label, step, batch_size,img_dir):
     num_class = 6
-    #img_dir = '/home/jiaozirui/ssd/Train'
+    #img_dir = '/home/p40/ssd/Train'
     batch_img = input_imgs[step * batch_size: (step + 1) * batch_size]
     batch_label = input_label[step * batch_size: (step + 1) * batch_size]
     batch_imgs = [np.asarray(imread(os.path.join(img_dir, img)).astype(np.float))/255 for img in batch_img]
@@ -428,8 +465,8 @@ def plot_confusion_matrix(cls_pred):
 
 def train(img_dir,classes,X_train_final,y_train_final,X_valid,y_valid,count):
     #构建训练样本,按batch输入,正常类别随机取3w张图像
-    # img_dir = '/home/jiaozirui/ssd/Train/'
-    summary_path = '/home/jiaozirui/git/Trial/summary'
+    # img_dir = '/home/p40/ssd/Train/'
+    summary_path = '/home/p40/git/Trial/summary'
     # classes = ['Normal','Chip','RedIron','Hole','Wrinkle','Dirty']
     Train_Epochs = 100
     #先将lr放大十倍，即0.002
@@ -463,8 +500,8 @@ def train(img_dir,classes,X_train_final,y_train_final,X_valid,y_valid,count):
 
 
     merged_summary_op = tf.summary.merge_all()
-    summary_writer = tf.summary.FileWriter(summary_path+'/train', graph=tf.get_default_graph())
-    summary_valid_writer = tf.summary.FileWriter(summary_path+'/test',graph= tf.get_default_graph())
+    summary_writer = tf.summary.FileWriter(summary_path+'/train', graph=sess.graph)
+    summary_valid_writer = tf.summary.FileWriter(summary_path+'/test',graph= sess.graph)
     stop_count = 0
     all_best_accuracy = 0
     for epoch in range(Train_Epochs):
@@ -480,7 +517,7 @@ def train(img_dir,classes,X_train_final,y_train_final,X_valid,y_valid,count):
             #训练
             _, total_loss, accuarcy,summary= sess.run([vgg_name.optimize_op, vgg_name.total_loss,
                                                        vgg_name.accuracy,merged_summary_op],
-                                                       feed_dict={vgg_name.imgs:trimgs, vgg_name.label:trlabels,vgg_name.keep_prob:0.9})
+                                                       feed_dict={vgg_name.imgs:trimgs, vgg_name.label:trlabels,vgg_name.keep_prob:0.4})
 
             print('total_loss:', total_loss,' accuarcy:', accuarcy)
             summary_writer.add_summary(summary,(epoch)*max_iter+step)
@@ -546,7 +583,7 @@ def train(img_dir,classes,X_train_final,y_train_final,X_valid,y_valid,count):
                             y_true[vstep * batch_size:(vstep + 1) * batch_size], = sess.run \
                                 ([y_pred_cls, y_true_cls],feed_dict={vgg_name.imgs: vimgs, vgg_name.label: vlabels,vgg_name.keep_prob:1.0})
                         cm = confusion_matrix(y_true=y_true,y_pred=y_pred)
-                        f = open('/home/jiaozirui/git/Trial/log/confusion_matrix.txt', 'a')
+                        f = open('/home/p40/git/Trial/log/confusion_matrix.txt', 'a')
                         now = datetime.datetime.now()
                         f.write(now.strftime('%Y-%m-%d %H:%M:%S')+ "\n")
                         f.write("第" + str(count) + "折分类混淆矩阵：\n")
@@ -564,7 +601,7 @@ def train(img_dir,classes,X_train_final,y_train_final,X_valid,y_valid,count):
             # f.write("\n\n")
         # f.close()
 if __name__ == '__main__':
-    img_dir = '/home/jiaozirui/ssd/Train/'
+    img_dir = '/home/p40/ssd/Train/'
     classes = ['Normal', 'Chip', 'RedIron', 'Hole', 'Wrinkle', 'Dirty']
     X,y = construct_train_imgs(img_dir,classes)
     #十折交叉
@@ -600,7 +637,7 @@ if __name__ == '__main__':
             # 这就是每一折的训练集和验证集
         X_train, X_valid = X[train_index], X[valid_index]
         y_train, y_valid = y[train_index], y[valid_index]
-        file_open = open('/home/jiaozirui/git/Trial/log/splits_content.txt','a')
+        file_open = open('/home/p40/git/Trial/log/splits_content.txt','a')
         now = datetime.datetime.now()
         file_open.write(now.strftime('%Y-%m-%d %H:%M:%S'))
         file_open.write("第" + str(count) + "折分类结果：\n\n")
