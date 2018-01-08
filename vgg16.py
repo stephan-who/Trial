@@ -47,7 +47,7 @@ class vgg16:
         with tf.name_scope('conv1_1') as scope:
             # kernel = tf.Variable(tf.truncated_normal([3, 3, 1, 64], dtype=tf_dtype,
             #                                          stddev=1e-1), name='weights')
-            kernel = tf.get_variable('weights',shape=[3,3,1,64],initializer=tf.glorot_normal_initializer())
+            kernel = tf.get_variable('conv1_1',shape=[3,3,1,64],initializer=tf.glorot_normal_initializer())
             conv = tf.nn.conv2d(self.imgs, kernel, [1, 1, 1, 1], padding='SAME')
             biases = tf.Variable(tf.constant(0.0, shape=[64], dtype=tf_dtype),
                                  trainable=True, name='biases')
@@ -60,7 +60,7 @@ class vgg16:
         with tf.name_scope('conv1_2') as scope:
             # kernel = tf.Variable(tf.truncated_normal([3, 3, 64, 64], dtype=tf_dtype,
             #                                          stddev=1e-1), name='weights')
-            kernel = tf.get_variable('weights',shape=[3,3,64,64],initializer=tf.glorot_normal_initializer())
+            kernel = tf.get_variable('conv1_2',shape=[3,3,64,64],initializer=tf.glorot_normal_initializer())
             conv = tf.nn.conv2d(self.conv1_1, kernel, [1, 1, 1, 1], padding='SAME')
             biases = tf.Variable(tf.constant(0.0, shape=[64], dtype=tf_dtype),
                                  trainable=True, name='biases')
@@ -79,7 +79,7 @@ class vgg16:
         with tf.name_scope('conv2_1') as scope:
             # kernel = tf.Variable(tf.truncated_normal([3, 3, 64, 128], dtype=tf_dtype,
             #                                          stddev=1e-1), name='weights')
-            kernel = tf.get_variable('weights',shape=[3,3,64,128],initializer=tf.glorot_normal_initializer())
+            kernel = tf.get_variable('conv2_1',shape=[3,3,64,128],initializer=tf.glorot_normal_initializer())
             conv = tf.nn.conv2d(self.pool1, kernel, [1, 1, 1, 1], padding='SAME')
             biases = tf.Variable(tf.constant(0.0, shape=[128], dtype=tf_dtype),
                                  trainable=True, name='biases')
@@ -91,7 +91,7 @@ class vgg16:
         with tf.name_scope('conv2_2') as scope:
             # kernel = tf.Variable(tf.truncated_normal([3, 3, 128, 128], dtype=tf_dtype,
             #                                          stddev=1e-1), name='weights')
-            kernel = tf.get_variable('weights',shape=[3,3,128,128],initializer=tf.glorot_normal_initializer())
+            kernel = tf.get_variable('conv2_2',shape=[3,3,128,128],initializer=tf.glorot_normal_initializer())
             conv = tf.nn.conv2d(self.conv2_1, kernel, [1, 1, 1, 1], padding='SAME')
             biases = tf.Variable(tf.constant(0.0, shape=[128], dtype=tf_dtype),
                                  trainable=True, name='biases')
@@ -110,7 +110,7 @@ class vgg16:
         with tf.name_scope('conv3_1') as scope:
             # kernel = tf.Variable(tf.truncated_normal([3, 3, 128, 256], dtype=tf_dtype,
             #                                          stddev=1e-1), name='weights')
-            kernel = tf.get_variable('weights',shape=[3,3,128,256],initializer=tf.glorot_normal_initializer())
+            kernel = tf.get_variable('conv3_1',shape=[3,3,128,256],initializer=tf.glorot_normal_initializer())
             conv = tf.nn.conv2d(self.pool2, kernel, [1, 1, 1, 1], padding='SAME')
             biases = tf.Variable(tf.constant(0.0, shape=[256], dtype=tf_dtype),
                                  trainable=True, name='biases')
@@ -123,7 +123,7 @@ class vgg16:
         with tf.name_scope('conv3_2') as scope:
             # kernel = tf.Variable(tf.truncated_normal([3, 3, 256, 256], dtype=tf_dtype,
             #                                          stddev=1e-1), name='weights')
-            kernel = tf.get_variable('weights',shape=[3,3,256,256],initializer=tf.glorot_normal_initializer())
+            kernel = tf.get_variable('conv3_2',shape=[3,3,256,256],initializer=tf.glorot_normal_initializer())
             conv = tf.nn.conv2d(self.conv3_1, kernel, [1, 1, 1, 1], padding='SAME')
             biases = tf.Variable(tf.constant(0.0, shape=[256], dtype=tf_dtype),
                                  trainable=True, name='biases')
@@ -135,7 +135,7 @@ class vgg16:
         with tf.name_scope('conv3_3') as scope:
             # kernel = tf.Variable(tf.truncated_normal([3, 3, 256, 256], dtype=tf_dtype,
             #                                          stddev=1e-1), name='weights')
-            kernel = tf.get_variable('weights',shape=[3,3,256,256],initializer=tf.glorot_normal_initializer())
+            kernel = tf.get_variable('conv3_3',shape=[3,3,256,256],initializer=tf.glorot_normal_initializer())
             conv = tf.nn.conv2d(self.conv3_2, kernel, [1, 1, 1, 1], padding='SAME')
             biases = tf.Variable(tf.constant(0.0, shape=[256], dtype=tf_dtype),
                                  trainable=True, name='biases')
@@ -154,7 +154,7 @@ class vgg16:
         with tf.name_scope('conv4_1') as scope:
             # kernel = tf.Variable(tf.truncated_normal([3, 3, 256, 512], dtype=tf_dtype,
             #                                          stddev=1e-1), name='weights')
-            kernel = tf.get_variable('weights',shape=[3,3,256,512],initializer=tf.glorot_normal_initializer())
+            kernel = tf.get_variable('conv4_1',shape=[3,3,256,512],initializer=tf.glorot_normal_initializer())
             conv = tf.nn.conv2d(self.pool3, kernel, [1, 1, 1, 1], padding='SAME')
             biases = tf.Variable(tf.constant(0.0, shape=[512], dtype=tf_dtype),
                                  trainable=True, name='biases')
@@ -166,7 +166,7 @@ class vgg16:
         with tf.name_scope('conv4_2') as scope:
             # kernel = tf.Variable(tf.truncated_normal([3, 3, 512, 512], dtype=tf_dtype,
             #                                          stddev=1e-1), name='weights')
-            kernel = tf.get_variable('weights',shape=[3,3,512,512],initializer=tf.glorot_normal_initializer())
+            kernel = tf.get_variable('conv4_2',shape=[3,3,512,512],initializer=tf.glorot_normal_initializer())
             conv = tf.nn.conv2d(self.conv4_1, kernel, [1, 1, 1, 1], padding='SAME')
             biases = tf.Variable(tf.constant(0.0, shape=[512], dtype=tf_dtype),
                                  trainable=True, name='biases')
@@ -178,7 +178,7 @@ class vgg16:
         with tf.name_scope('conv4_3') as scope:
             # kernel = tf.Variable(tf.truncated_normal([3, 3, 512, 512], dtype=tf_dtype,
             #                                          stddev=1e-1), name='weights')
-            kernel = tf.get_variable('weights',shape=[3,3,512,512],initializer=tf.glorot_normal_initializer())
+            kernel = tf.get_variable('conv4_3',shape=[3,3,512,512],initializer=tf.glorot_normal_initializer())
             conv = tf.nn.conv2d(self.conv4_2, kernel, [1, 1, 1, 1], padding='SAME')
             biases = tf.Variable(tf.constant(0.0, shape=[512], dtype=tf_dtype),
                                  trainable=True, name='biases')
@@ -197,7 +197,7 @@ class vgg16:
         with tf.name_scope('conv5_1') as scope:
             # kernel = tf.Variable(tf.truncated_normal([3, 3, 512, 512], dtype=tf_dtype,
             #                                          stddev=1e-1), name='weights')
-            kernel = tf.get_variable('weights',shape=[3,3,512,512],initializer=tf.glorot_normal_initializer())
+            kernel = tf.get_variable('conv5_1',shape=[3,3,512,512],initializer=tf.glorot_normal_initializer())
 
             conv = tf.nn.conv2d(self.pool4, kernel, [1, 1, 1, 1], padding='SAME')
             biases = tf.Variable(tf.constant(0.0, shape=[512], dtype=tf_dtype),
@@ -210,7 +210,7 @@ class vgg16:
         with tf.name_scope('conv5_2') as scope:
             # kernel = tf.Variable(tf.truncated_normal([3, 3, 512, 512], dtype=tf_dtype,
             #                                          stddev=1e-1), name='weights')
-            kernel = tf.get_variable('weights',shape=[3,3,512,512],initializer=tf.glorot_normal_initializer())
+            kernel = tf.get_variable('conv5_2',shape=[3,3,512,512],initializer=tf.glorot_normal_initializer())
             conv = tf.nn.conv2d(self.conv5_1, kernel, [1, 1, 1, 1], padding='SAME')
             biases = tf.Variable(tf.constant(0.0, shape=[512], dtype=tf_dtype),
                                  trainable=True, name='biases')
@@ -222,7 +222,7 @@ class vgg16:
         with tf.name_scope('conv5_3') as scope:
             # kernel = tf.Variable(tf.truncated_normal([3, 3, 512, 512], dtype=tf_dtype,
             #                                          stddev=1e-1), name='weights')
-            kernel = tf.get_variable('weights',shape=[3,3,512,512],initializer=tf.glorot_normal_initializer())
+            kernel = tf.get_variable('conv5_3',shape=[3,3,512,512],initializer=tf.glorot_normal_initializer())
 
             conv = tf.nn.conv2d(self.conv5_2, kernel, [1, 1, 1, 1], padding='SAME')
             biases = tf.Variable(tf.constant(0.0, shape=[512], dtype=tf_dtype),
@@ -245,7 +245,7 @@ class vgg16:
             # fc1w = tf.Variable(tf.truncated_normal([shape, 512],
             #                                              dtype=tf_dtype,
             #                                              stddev=1e-1), name='weights')
-            fc1w = tf.get_variable('weights',shape=[shape,512],initializer=tf.glorot_normal_initializer())
+            fc1w = tf.get_variable('fc1',shape=[shape,512],initializer=tf.glorot_normal_initializer())
             fc1b = tf.Variable(tf.constant(1.0, shape=[512], dtype=tf_dtype),
                                  trainable=True, name='biases')
             pool5_flat = tf.reshape(self.pool5, [-1, shape])
@@ -271,7 +271,7 @@ class vgg16:
             # fc3w = tf.Variable(tf.truncated_normal([512, self.classes],
             #                                              dtype=tf_dtype,
             #                                              stddev=1e-1), name='weights')
-            fc3w = tf.get_variable('weights',shape=[512,self.classes],initializer=tf.glorot_normal_initializer())
+            fc3w = tf.get_variable('fc3',shape=[512,self.classes],initializer=tf.glorot_normal_initializer())
 
             fc3b = tf.Variable(tf.constant(1.0, shape=[self.classes], dtype=tf_dtype),
                                  trainable=True, name='biases')
@@ -525,21 +525,21 @@ def train(img_dir,classes,X_train_final,y_train_final,X_valid,y_valid,count):
                 # 验证集上验证
                 valid_step = int(step/100)
                 vimgs, vlabels = generate_batch(valid_imgs, valid_label, valid_step%max_valid_iter, batch_size, img_dir)
-                # tf.summary.histogram("conv1_1", vgg_name.conv1_1)
-                # tf.summary.histogram("conv1_2", vgg_name.conv1_2)
-                # tf.summary.histogram("conv2_1", vgg_name.conv2_1)
-                # tf.summary.histogram("conv2_2", vgg_name.conv2_2)
-                # tf.summary.histogram("conv3_1", vgg_name.conv3_1)
-                # tf.summary.histogram("conv3_2", vgg_name.conv3_2)
-                # tf.summary.histogram("conv3_3", vgg_name.conv3_3)
-                # tf.summary.histogram("conv4_1", vgg_name.conv4_1)
-                # tf.summary.histogram("conv4_2", vgg_name.conv4_2)
-                # tf.summary.histogram("conv4_3", vgg_name.conv4_3)
-                # tf.summary.histogram("conv5_1", vgg_name.conv5_1)
-                # tf.summary.histogram("conv5_2", vgg_name.conv5_2)
-                # tf.summary.histogram("conv5_3", vgg_name.conv5_3)
-                # tf.summary.histogram("fc1", vgg_name.fc1)
-                # tf.summary.histogram("fc2", vgg_name.fc2)
+                tf.summary.histogram("conv1_1", vgg_name.conv1_1)
+                tf.summary.histogram("conv1_2", vgg_name.conv1_2)
+                tf.summary.histogram("conv2_1", vgg_name.conv2_1)
+                tf.summary.histogram("conv2_2", vgg_name.conv2_2)
+                tf.summary.histogram("conv3_1", vgg_name.conv3_1)
+                tf.summary.histogram("conv3_2", vgg_name.conv3_2)
+                tf.summary.histogram("conv3_3", vgg_name.conv3_3)
+                tf.summary.histogram("conv4_1", vgg_name.conv4_1)
+                tf.summary.histogram("conv4_2", vgg_name.conv4_2)
+                tf.summary.histogram("conv4_3", vgg_name.conv4_3)
+                tf.summary.histogram("conv5_1", vgg_name.conv5_1)
+                tf.summary.histogram("conv5_2", vgg_name.conv5_2)
+                tf.summary.histogram("conv5_3", vgg_name.conv5_3)
+                tf.summary.histogram("fc1", vgg_name.fc1)
+                tf.summary.histogram("fc2", vgg_name.fc2)
                 # y_true_cls = tf.argmax(vlabels, 1)
                 # y_pred_cls = tf.argmax(vgg_name.probs,1)
                 print('vlabels:', len(vlabels))
